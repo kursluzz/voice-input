@@ -102,7 +102,7 @@ class PasteInserter:
         combo: KeyCombo,
         *,
         restore_clipboard: bool = False,
-        settle_delay: float = 0.08,
+        settle_delay: float = 0.15,
         restore_delay: float = 0.6,
         sleep: Callable[[float], None] = time.sleep,
         in_background: Callable[[Callable[[], None]], None] | None = None,
@@ -192,7 +192,7 @@ def build_inserter(config: Config, session: Session, *, which: Which = which) ->
     method = choose_method(config.insert_method, session, which=which)
     _log.info("text insertion: %s (session %s)", method.value, session.kind)
     return PasteInserter(
-        clipboard_for(session),
+        clipboard_for(session, config.clipboard),
         build_keyboard(method),
         parse_combo(config.paste_keys),
         restore_clipboard=config.restore_clipboard,

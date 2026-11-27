@@ -9,8 +9,8 @@ from typing import Any
 
 import pytest
 
-from voice_input.config import Config, InsertMethod
-from voice_input.insert.clipboard import WaylandClipboard, X11Clipboard, clipboard_for
+from voice_input.config import ClipboardBackend, Config, InsertMethod
+from voice_input.insert.clipboard import WaylandClipboard, choose_backend, clipboard_for
 from voice_input.insert.inserter import (
     PasteFailedError,
     PasteInserter,
@@ -33,6 +33,7 @@ from voice_input.insert.uinput import (
     UinputError,
     UinputKeyboard,
 )
+from voice_input.insert.xselection import XSelectionClipboard
 from voice_input.system import CommandFailedError, CommandNotFoundError, CommandResult, Session
 
 SHIFT_INSERT = parse_combo("shift+insert")
@@ -91,19 +92,27 @@ def test_wayland_clipboard_get() -> None:
     assert WaylandClipboard(FakeRunner(missing=frozenset({"wl-paste"}))).get_text() is None
 
 
-def test_x11_clipboard() -> None:
-    runner = FakeRunner(stdout="old")
-    clipboard = X11Clipboard(runner)
-    clipboard.set_text("שלום")
-    assert [call[0][2] for call in runner.calls] == ["clipboard", "primary"]
-    assert clipboard.get_text() == "old"
-    with pytest.raises(CommandNotFoundError, match="apt install xclip"):
-        X11Clipboard(FakeRunner(missing=frozenset({"xclip"}))).set_text("x")
+def test_choose_clipboard_backend() -> None:
+    def yes() -> bool:
+        return True
+
+    def no() -> bool:
+        return False
+
+    auto = ClipboardBackend.AUTO
+    assert choose_backend(auto, GNOME, x11_ok=yes) is ClipboardBackend.X11
+    assert choose_backend(auto, GNOME, x11_ok=no) is ClipboardBackend.WL_CLIPBOARD
+    assert choose_backend(auto, SWAY, x11_ok=yes) is ClipboardBackend.WL_CLIPBOARD
+    assert choose_backend(auto, X11, x11_ok=no) is ClipboardBackend.X11
+    forced = ClipboardBackend.WL_CLIPBOARD
+    assert choose_backend(forced, X11, x11_ok=yes) is ClipboardBackend.WL_CLIPBOARD
 
 
 def test_clipboard_for_session() -> None:
-    assert isinstance(clipboard_for(GNOME), WaylandClipboard)
-    assert isinstance(clipboard_for(X11), X11Clipboard)
+    assert isinstance(clipboard_for(GNOME, x11_ok=lambda: True), XSelectionClipboard)
+    assert isinstance(clipboard_for(GNOME, x11_ok=lambda: False), WaylandClipboard)
+    assert isinstance(clipboard_for(SWAY, x11_ok=lambda: True), WaylandClipboard)
+    assert isinstance(clipboard_for(X11), XSelectionClipboard)
 
 
 # --- command keyboards ---------------------------------------------------------------------
@@ -252,7 +261,11 @@ def test_build_keyboard() -> None:
 
 
 def test_build_inserter_from_config() -> None:
-    config = Config(insert_method=InsertMethod.CLIPBOARD, paste_keys="ctrl+v")
+    config = Config(
+        insert_method=InsertMethod.CLIPBOARD,
+        paste_keys="ctrl+v",
+        clipboard=ClipboardBackend.WL_CLIPBOARD,
+    )
     inserter = build_inserter(config, GNOME)
     assert inserter.method == "clipboard"
     assert isinstance(inserter.clipboard, WaylandClipboard)

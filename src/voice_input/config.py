@@ -34,6 +34,14 @@ class InsertMethod(StrEnum):
     CLIPBOARD = "clipboard"  # copy only; the user pastes by hand
 
 
+class ClipboardBackend(StrEnum):
+    """Which mechanism owns the clipboard."""
+
+    AUTO = "auto"  # X11 selections on X11 and on GNOME (through XWayland), else wl-clipboard
+    X11 = "x11"
+    WL_CLIPBOARD = "wl-clipboard"
+
+
 class Shortcut(StrEnum):
     """Actions that get a desktop keyboard shortcut."""
 
@@ -77,6 +85,7 @@ class Config:
     cue_volume: float = 0.25
     notifications: bool = True
     insert_method: InsertMethod = InsertMethod.AUTO
+    clipboard: ClipboardBackend = ClipboardBackend.AUTO
     paste_keys: str = "shift+insert"
     restore_clipboard: bool = False
     trailing_space: bool = True
@@ -229,6 +238,7 @@ _PARSERS: Final[dict[str, Callable[[str, Any], Any]]] = {
     "cue_volume": lambda k, v: _number(k, v, 0.0, 1.0),
     "notifications": _bool,
     "insert_method": _insert_method,
+    "clipboard": lambda k, v: ClipboardBackend(_choice(k, v, tuple(ClipboardBackend))),
     "paste_keys": _paste_keys,
     "restore_clipboard": _bool,
     "trailing_space": _bool,
@@ -328,6 +338,8 @@ notifications = true
 
 # How the text reaches the focused window: auto, uinput, ydotool, wtype, xdotool, clipboard.
 insert_method = "auto"
+# Who holds the copied text: auto, x11 (also GNOME on Wayland, through XWayland), wl-clipboard.
+clipboard = "auto"
 # Shift+Insert pastes in browsers, editors and terminals alike.
 paste_keys = "shift+insert"
 restore_clipboard = false   # put the previous clipboard text back after pasting

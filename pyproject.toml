@@ -23,6 +23,7 @@ classifiers = [
 dependencies = [
     "faster-whisper>=1.2.1",
     "numpy>=2.0",
+    "python-xlib>=0.33",
     "sounddevice>=0.5.1",
 ]
 
@@ -102,7 +103,7 @@ files = ["src", "tests"]
 warn_unreachable = true
 
 [[tool.mypy.overrides]]
-module = ["faster_whisper", "faster_whisper.*", "sounddevice", "ctranslate2", "huggingface_hub", "huggingface_hub.*"]
+module = ["Xlib", "Xlib.*", "faster_whisper", "faster_whisper.*", "sounddevice", "ctranslate2", "huggingface_hub", "huggingface_hub.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
