@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_call: # the release workflow runs these same checks on the tagged commit
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Test (Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: "0.12.13"
+      - name: System packages (PortAudio, and Xvfb for the X11 selection tests)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libportaudio2 xvfb xauth
+      - run: uv sync --python ${{ matrix.python }}
+      - name: Tests, including the X11 clipboard tests on a virtual display
+        env:
+          VOICE_INPUT_TEST_X11: "1"
+        run: xvfb-run -a uv run --no-sync pytest -q -rs --cov --cov-report=term
+
+  lint:
+    name: Lint and types
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: "0.12.13"
+      - run: uv lock --check
+      - run: uv sync
+      - run: uv run --no-sync ruff check .
+      - run: uv run --no-sync ruff format --check .
+      - run: uv run --no-sync mypy
+
+  build:
+    name: Build and smoke-test the wheel
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: "0.12.13"
+      - run: uv build
+      - name: Check the package metadata and README rendering
+        run: uvx --from twine==7.0.0 twine check --strict dist/*
+      - name: Smoke-test the built wheel
+        run: |
+          uvx --from dist/*.whl voice-input --version
+          uvx --from dist/*.whl voice-input config --example > /dev/null
+      - name: Build a wheel from the sdist, to catch files missing from the source distribution
+        run: |
+          uv build --wheel --out-dir from-sdist dist/*.tar.gz
+          uvx --from from-sdist/*.whl voice-input --version
