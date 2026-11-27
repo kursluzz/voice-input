@@ -44,6 +44,22 @@ def executable() -> str:
     return found if found else f"{sys.executable} -m voice_input"
 
 
+_TEMPORARY_MARKERS: Final = ("/.cache/uv/", "/archive-v0/", "/pipx/.cache/", "/tmp/")
+
+
+def stable_executable() -> str:
+    """:func:`executable`, refusing locations that disappear (``uvx``, ``pipx run``)."""
+    command = executable()
+    if any(marker in command for marker in _TEMPORARY_MARKERS):
+        raise CliError(
+            f"voice-input runs from a temporary environment ({command}), so shortcuts and the "
+            "service would break when it is cleaned up. Install it first: "
+            "uv tool install git+https://github.com/kursluzz/voice-input",
+            EXIT_USAGE,
+        )
+    return command
+
+
 def _language(value: str | None) -> tuple[Language | None, bool]:
     """``(language, use_default)`` from a ``--lang`` option."""
     if value is None:
@@ -325,7 +341,7 @@ def setup_shortcuts(args: argparse.Namespace, config: Config) -> None:
         removed = shortcuts.remove() if not args.dry_run else list(shortcuts.installed())
         print(f"shortcuts: removed {len(removed)}")
         return
-    planned = plan(config.shortcuts, executable())
+    planned = plan(config.shortcuts, stable_executable())
     for item in planned:
         conflicts = shortcuts.conflicts(item.binding)
         warning = f"   ! also used by: {', '.join(conflicts)}" if conflicts else ""
@@ -347,7 +363,8 @@ def setup_service(args: argparse.Namespace) -> None:
         removed = service.remove()
         print(f"service: {'removed' if removed else 'not installed'}")
         return
-    print(f"{service.path}:\n{render_unit(executable())}")
+    command = stable_executable()
+    print(f"{service.path}:\n{render_unit(command)}")
     if args.dry_run:
         return
     try:  # a daemon started on demand would block the service's own daemon
@@ -358,7 +375,7 @@ def setup_service(args: argparse.Namespace) -> None:
         import time
 
         time.sleep(1.0)
-    service.install(executable())
+    service.install(command)
     print("service: enabled and started")
 
 

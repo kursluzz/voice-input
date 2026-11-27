@@ -156,3 +156,13 @@ def test_doctor_models() -> None:
 def test_check_render() -> None:
     assert Check("x", Level.OK, "fine").render() == "✓ x: fine"
     assert Check("x", Level.WARN, "hmm", "do this").render() == "! x: hmm\n    → do this"
+
+
+def test_setup_refuses_a_temporary_environment(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    monkeypatch.setattr(
+        "shutil.which", lambda name: "/home/u/.cache/uv/archive-v0/abc/bin/voice-input"
+    )
+    assert cli.main(["setup", "service", "--dry-run"]) == cli.EXIT_USAGE
+    assert "uv tool install" in capsys.readouterr().err
