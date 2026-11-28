@@ -43,5 +43,6 @@ the `[Unreleased]` entries below into a dated version section.
 - Removal of phantom phrases Whisper produces on silence ("Субтитры сделал DimaTorzok",
   "Thanks for watching!").
 
-[Unreleased]: https://github.com/kursluzz/voice-input/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/kursluzz/voice-input/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/kursluzz/voice-input/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/kursluzz/voice-input/releases/tag/v0.1.0
