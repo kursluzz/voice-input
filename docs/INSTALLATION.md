@@ -30,10 +30,10 @@ Choose one:
 uv tool install git+https://github.com/kursluzz/voice-input
 
 # uv, pinned to a release tag (see https://github.com/kursluzz/voice-input/releases)
-uv tool install git+https://github.com/kursluzz/voice-input@v0.1.0
+uv tool install git+https://github.com/kursluzz/voice-input@v0.2.0
 
 # uv, from a release's wheel file
-uv tool install "voice-input @ https://github.com/kursluzz/voice-input/releases/download/v0.1.0/voice_input-0.1.0-py3-none-any.whl"
+uv tool install "voice-input @ https://github.com/kursluzz/voice-input/releases/download/v0.2.0/voice_input-0.2.0-py3-none-any.whl"
 
 # pipx
 pipx install git+https://github.com/kursluzz/voice-input
@@ -117,14 +117,38 @@ set. Without this step the first dictation downloads the model.
 ## Upgrade
 
 ```bash
-uv tool upgrade voice-input
+voice-input --version              # what is installed now
+
+uv tool upgrade voice-input        # to the latest commit on main (pipx: pipx upgrade voice-input)
 # or, to be explicit about the source:
 uv tool install --force git+https://github.com/kursluzz/voice-input
 ```
 
-Then restart the daemon so it runs the new code: `systemctl --user restart voice-input` with the
-login service, otherwise `voice-input shutdown` (the next shortcut press starts it again). Your
-configuration, shortcuts and models are kept.
+Then:
+
+```bash
+voice-input setup shortcuts             # picks up changed default keys, if a release changed them
+systemctl --user restart voice-input    # without the login service: voice-input shutdown
+voice-input doctor
+```
+
+The daemon must be restarted to run the new code; without the login service, `voice-input
+shutdown` is enough (the next shortcut press starts it again). Your configuration, shortcuts and
+models are kept. The [changelog](../CHANGELOG.md) lists what changed in each release.
+
+### Install or switch to a specific version
+
+Releases are git tags, listed on the [releases page](https://github.com/kursluzz/voice-input/releases).
+Install one with `@<tag>`; `--force` replaces whatever version is installed, so the same command
+upgrades, downgrades or switches back from `main`:
+
+```bash
+uv tool install --force git+https://github.com/kursluzz/voice-input@v0.2.0
+pipx install --force git+https://github.com/kursluzz/voice-input@v0.2.0
+```
+
+A version installed from a tag stays on that tag: `uv tool upgrade` does not move it. To follow
+`main` again, install without `@<tag>`. Afterwards, restart the daemon as above.
 
 ## Uninstall
 

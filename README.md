@@ -56,7 +56,21 @@ by itself after five minutes. `voice-input cancel` throws a recording away; bind
 the `cancel` entry in the [configuration](docs/CONFIGURATION.md#shortcuts).
 
 The keys are configurable. `voice-input setup shortcuts` installs them in GNOME and warns about
-conflicts; on other desktops, bind the commands from the table below in your keyboard settings.
+conflicts; on other desktops, bind the commands from the [Commands](#commands) table in your
+keyboard settings. To change a key, put it in `~/.config/voice-input/config.toml` and install the
+shortcuts again:
+
+```toml
+[shortcuts]
+default = "<Super>t"          # instead of Super+Insert
+he = ""                       # no Hebrew shortcut
+```
+
+```bash
+voice-input setup shortcuts
+```
+
+All keys and their syntax: [docs/CONFIGURATION.md](docs/CONFIGURATION.md#shortcuts).
 
 ## How it works
 
@@ -83,7 +97,7 @@ session, Python 3.12–3.14 (uv installs one if needed), PortAudio (`libportaudi
 | Tool | Command |
 |---|---|
 | [uv](https://docs.astral.sh/uv/) (recommended) | `uv tool install git+https://github.com/kursluzz/voice-input` |
-| uv, a specific release | `uv tool install git+https://github.com/kursluzz/voice-input@v0.1.0` |
+| uv, a specific release | `uv tool install git+https://github.com/kursluzz/voice-input@v0.2.0` |
 | [pipx](https://pipx.pypa.io/) | `pipx install git+https://github.com/kursluzz/voice-input` |
 | pip, in a virtual environment | `pip install git+https://github.com/kursluzz/voice-input` |
 | From a clone | `git clone https://github.com/kursluzz/voice-input && cd voice-input && uv tool install .` |
@@ -91,8 +105,12 @@ session, Python 3.12–3.14 (uv installs one if needed), PortAudio (`libportaudi
 Then run `voice-input setup all` (or the parts you want, see below) and `voice-input doctor`.
 
 - **Upgrade:** `uv tool upgrade voice-input` (or `pipx upgrade voice-input`), then
-  `voice-input shutdown` so the next shortcut starts the new version (with the login service:
-  `systemctl --user restart voice-input`).
+  `voice-input setup shortcuts` and `systemctl --user restart voice-input` (without the login
+  service: `voice-input shutdown`).
+- **A specific version:** `uv tool install --force git+https://github.com/kursluzz/voice-input@v0.2.0`
+  installs, upgrades or downgrades to that release; see
+  [releases](https://github.com/kursluzz/voice-input/releases). A tagged install stays on its tag
+  until you install another one.
 - **Uninstall:** `voice-input setup all --remove`, then `uv tool uninstall voice-input`.
 
 [docs/INSTALLATION.md](docs/INSTALLATION.md) covers each step, other desktops, X11, and where files
