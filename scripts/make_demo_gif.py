@@ -218,7 +218,7 @@ def frames_for(scene: Scene) -> list[Image.Image]:
 def main() -> None:
     texts = TEXTS
     scenes = [
-        Scene("browser", "Super+T", "auto-detect", texts["en"]),
+        Scene("browser", "Super+Insert", "auto-detect", texts["en"]),
         Scene("terminal", "Shift+Super+R", "Русский", texts["ru"]),
         Scene("editor", "Shift+Super+H", "עברית", texts["he"], rtl=True),
     ]

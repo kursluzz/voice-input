@@ -72,6 +72,25 @@ def normalize_binding(binding: str) -> tuple[frozenset[str], str] | None:
     return modifiers, key
 
 
+def triggered_by_paste(binding: str, paste_keys: str) -> bool:
+    """Whether pressing ``paste_keys`` could fire the shortcut ``binding``.
+
+    The paste is pressed right after the second shortcut press, often while its modifiers are
+    still held, so the desktop sees the paste keys plus those modifiers. A shortcut made of the
+    paste keys and extra modifiers (``<Shift><Super>Insert`` for Shift+Insert) would then start a
+    new recording instead of pasting.
+    """
+    from voice_input.insert.keys import XKB_NAMES, parse_combo
+
+    normalized = normalize_binding(binding)
+    if normalized is None:
+        return False
+    modifiers, key = normalized
+    combo = parse_combo(paste_keys)
+    paste_modifiers = {XKB_NAMES[code].lower() for code in combo.modifiers}
+    return key == XKB_NAMES[combo.key].lower() and paste_modifiers <= modifiers
+
+
 @dataclass(frozen=True)
 class PlannedShortcut:
     action: Shortcut

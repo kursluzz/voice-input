@@ -53,7 +53,7 @@ class Shortcut(StrEnum):
 
 
 DEFAULT_SHORTCUTS: Final[Mapping[Shortcut, str]] = {
-    Shortcut.DEFAULT: "<Super>t",
+    Shortcut.DEFAULT: "<Super>Insert",
     Shortcut.EN: "<Shift><Super>e",
     Shortcut.RU: "<Shift><Super>r",
     Shortcut.HE: "<Shift><Super>h",
@@ -348,8 +348,9 @@ trailing_space = true       # so consecutive dictations do not run together
 log_level = "INFO"
 
 # GNOME shortcuts installed by `voice-input setup shortcuts`. An empty string disables one.
+# Do not combine the paste keys (Shift+Insert) with Super: the paste would press the shortcut.
 [shortcuts]
-default = "<Super>t"
+default = "<Super>Insert"
 en = "<Shift><Super>e"
 ru = "<Shift><Super>r"
 he = "<Shift><Super>h"

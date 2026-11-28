@@ -67,7 +67,7 @@ from `which voice-input`:
 
 | Key (suggested) | Command |
 |---|---|
-| Super+T | `/home/you/.local/bin/voice-input toggle` |
+| Super+Insert | `/home/you/.local/bin/voice-input toggle` |
 | Shift+Super+E | `/home/you/.local/bin/voice-input toggle --lang en` |
 | Shift+Super+R | `/home/you/.local/bin/voice-input toggle --lang ru` |
 | Shift+Super+H | `/home/you/.local/bin/voice-input toggle --lang he` |

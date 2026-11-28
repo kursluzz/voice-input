@@ -166,3 +166,13 @@ def test_setup_refuses_a_temporary_environment(
     )
     assert cli.main(["setup", "service", "--dry-run"]) == cli.EXIT_USAGE
     assert "uv tool install" in capsys.readouterr().err
+
+
+def test_setup_shortcuts_refuses_a_shortcut_the_paste_would_press(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    monkeypatch.setattr("voice_input.desktop.gnome.GnomeShortcuts.available", lambda self: True)
+    path = tmp_path / "c.toml"
+    path.write_text('[shortcuts]\ndefault = "<Shift><Super>Insert"\n')
+    assert cli.main(["--config", str(path), "setup", "shortcuts", "--dry-run"]) == cli.EXIT_USAGE
+    assert "<Shift><Super>Insert" in capsys.readouterr().err

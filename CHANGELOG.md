@@ -7,6 +7,16 @@ the `[Unreleased]` entries below into a dated version section.
 
 ## [Unreleased]
 
+### Changed
+
+- The default dictation shortcut is now **Super+Insert** instead of Super+T, which is free in
+  GNOME. Run `voice-input setup shortcuts` after upgrading to move it.
+
+### Added
+
+- `voice-input setup shortcuts` refuses a shortcut that the paste keys would press again (for
+  example Shift+Super+Insert with the default Shift+Insert paste).
+
 ## [0.1.0] - 2026-11-28
 
 ### Added

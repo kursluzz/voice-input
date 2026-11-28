@@ -19,6 +19,7 @@ from voice_input.desktop.gnome import (
     parse_string_list,
     path_for,
     plan,
+    triggered_by_paste,
 )
 from voice_input.desktop.systemd import UserService, render_unit, unit_path
 from voice_input.system import CommandFailedError, CommandResult
@@ -50,6 +51,28 @@ def test_normalize_binding() -> None:
     assert normalize_binding("<Super>t") != normalize_binding("<Super><Shift>t")
     assert normalize_binding("") is None
     assert normalize_binding("disabled") is None
+
+
+@pytest.mark.parametrize(
+    ("binding", "paste_keys", "expected"),
+    [
+        # The virtual Shift+Insert while Super is still held is Super+Shift+Insert.
+        ("<Shift><Super>Insert", "shift+insert", True),
+        ("<Shift>Insert", "shift+insert", True),
+        ("<Super>Insert", "shift+insert", False),
+        ("<Super>Insert", "ctrl+shift+v", False),
+        ("<Primary><Shift><Super>v", "ctrl+shift+v", True),
+        ("<Super>t", "shift+insert", False),
+        ("", "shift+insert", False),
+    ],
+)
+def test_triggered_by_paste(binding: str, paste_keys: str, expected: bool) -> None:
+    assert triggered_by_paste(binding, paste_keys) is expected
+
+
+def test_default_shortcuts_are_not_triggered_by_the_default_paste() -> None:
+    for binding in DEFAULT_SHORTCUTS.values():
+        assert not triggered_by_paste(binding, "shift+insert")
 
 
 def test_plan_builds_commands_and_skips_empty_bindings() -> None:
@@ -126,7 +149,7 @@ def test_install_adds_entries_and_keeps_other_shortcuts() -> None:
     }
     installed = shortcuts.installed()
     assert installed[path_for(Shortcut.RU)] == ("<Shift><Super>r", "vi toggle --lang ru")
-    assert installed[path_for(Shortcut.DEFAULT)] == ("<Super>t", "vi toggle")
+    assert installed[path_for(Shortcut.DEFAULT)] == ("<Super>Insert", "vi toggle")
 
 
 def test_install_twice_is_idempotent_and_drops_disabled_actions() -> None:

@@ -37,7 +37,7 @@ voice-input setup all
 voice-input doctor
 ```
 
-Now click into any text field, press **Super+T**, speak, and press **Super+T** again. The first
+Now click into any text field, press **Super+Insert**, speak, and press **Super+Insert** again. The first
 dictation downloads the speech model (about 480 MB for `small`); run `voice-input download` to do
 that in advance.
 
@@ -45,7 +45,7 @@ that in advance.
 
 | Shortcut | Action |
 |---|---|
-| **Super+T** | Dictate in the default language (`auto`: detect English, Russian or Hebrew) |
+| **Super+Insert** | Dictate in the default language (`auto`: detect English, Russian or Hebrew) |
 | **Shift+Super+E** | Dictate in English |
 | **Shift+Super+R** | Dictate in Russian |
 | **Shift+Super+H** | Dictate in Hebrew |
@@ -132,7 +132,7 @@ Optional, in `~/.config/voice-input/config.toml`. `voice-input config --example`
 commented file with every setting. The most useful ones:
 
 ```toml
-language = "ru"            # default for Super+T: auto, en, ru or he
+language = "ru"            # default for Super+Insert: auto, en, ru or he
 model = "small"            # tiny, base, small, medium, large-v3-turbo, …
 input_device = "USB"       # part of the microphone's name (see `voice-input devices`)
 trailing_space = true      # add a space so consecutive dictations do not run together

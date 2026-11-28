@@ -30,7 +30,7 @@ def test_missing_file_gives_defaults(tmp_path: Path) -> None:
     assert config == Config()
     assert config.language is None
     assert config.model == "small"
-    assert config.shortcuts[Shortcut.DEFAULT] == "<Super>t"
+    assert config.shortcuts[Shortcut.DEFAULT] == "<Super>Insert"
 
 
 def test_file_values_are_parsed(tmp_path: Path) -> None:

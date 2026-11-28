@@ -18,7 +18,7 @@ The daemon reads the configuration when it starts. After a change, restart it:
 
 | Setting | Default | Meaning |
 |---|---|---|
-| `language` | `"auto"` | Language of the default shortcut (Super+T): `auto`, `en`, `ru` or `he`. |
+| `language` | `"auto"` | Language of the default shortcut (Super+Insert): `auto`, `en`, `ru` or `he`. |
 | `model` | `"small"` | Whisper model: `tiny`, `base`, `small`, `medium`, `large-v3`, `large-v3-turbo`, `distil-large-v3`, a Hugging Face repository with a CTranslate2 model, or a local directory. See [MODELS.md](MODELS.md). |
 | `[models]` | empty | Per-language models, for example `he = "ivrit-ai/whisper-large-v3-turbo-ct2"`. In `auto` mode the default model detects the language and the language's own model (if any) then recognises. |
 | `device` | `"auto"` | `auto` (CUDA when available, else CPU), `cpu` or `cuda`. |
@@ -63,12 +63,16 @@ followed by a key name.
 
 ```toml
 [shortcuts]
-default = "<Super>t"        # toggle in the configured `language`
+default = "<Super>Insert"   # toggle in the configured `language`
 en = "<Shift><Super>e"
 ru = "<Shift><Super>r"
 he = "<Shift><Super>h"
-cancel = ""                  # for example "<Shift><Super>t"
+cancel = ""                  # for example "<Super>Delete"
 ```
+
+Do not combine the paste keys with other modifiers, such as `<Shift><Super>Insert` with the default
+`paste_keys = "shift+insert"`: the paste happens while Super may still be held, so it would press
+the shortcut again. `voice-input setup shortcuts` refuses such a binding.
 
 ## Logging
 

@@ -329,7 +329,7 @@ def setup_uinput(args: argparse.Namespace) -> None:
 
 
 def setup_shortcuts(args: argparse.Namespace, config: Config) -> None:
-    from voice_input.desktop.gnome import GnomeShortcuts, plan
+    from voice_input.desktop.gnome import GnomeShortcuts, plan, triggered_by_paste
 
     shortcuts = GnomeShortcuts()
     if not shortcuts.available():
@@ -341,6 +341,17 @@ def setup_shortcuts(args: argparse.Namespace, config: Config) -> None:
         removed = shortcuts.remove() if not args.dry_run else list(shortcuts.installed())
         print(f"shortcuts: removed {len(removed)}")
         return
+    clashing = [
+        binding
+        for binding in config.shortcuts.values()
+        if triggered_by_paste(binding, config.paste_keys)
+    ]
+    if clashing:
+        raise CliError(
+            f"the shortcut {', '.join(clashing)} contains the paste keys ({config.paste_keys}), "
+            "so pasting the text would press it again. Choose another key in [shortcuts].",
+            EXIT_USAGE,
+        )
     planned = plan(config.shortcuts, stable_executable())
     for item in planned:
         conflicts = shortcuts.conflicts(item.binding)
