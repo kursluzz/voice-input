@@ -7,6 +7,8 @@ the `[Unreleased]` entries below into a dated version section.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-28
+
 ### Changed
 
 - The default dictation shortcut is now **Super+Insert** instead of Super+T, which is free in

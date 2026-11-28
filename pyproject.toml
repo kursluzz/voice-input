@@ -1,6 +1,6 @@
 [project]
 name = "voice-input"
-version = "0.1.0"
+version = "0.2.0"
 description = "Offline voice typing for the Linux desktop: press a shortcut, speak, and the text appears in the focused field."
 readme = "README.md"
 requires-python = ">=3.12,<3.15"
@@ -52,7 +52,7 @@ dev = [
 [tool.bumpversion]
 # Run `uv run bump-my-version bump patch|minor|major` on a clean main branch. It edits the files
 # below, refreshes uv.lock, commits and creates the tag v<version>. Nothing is pushed.
-current_version = "0.1.0"
+current_version = "0.2.0"
 commit = true
 tag = true
 tag_name = "v{new_version}"

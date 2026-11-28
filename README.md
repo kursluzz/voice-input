@@ -19,7 +19,7 @@ leaves the machine.
   a 4-core Intel i7; a CUDA GPU is used automatically when present.
 - **Licence:** MIT.
 
-Version 0.1.0, alpha.
+Version 0.2.0, alpha.
 
 ## Quick start
 
